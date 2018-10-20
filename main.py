@@ -1,57 +1,39 @@
 import random
+import numpy as np
 
 
-AMOUNT_OF_HOTELS = 100
-AMOUNT_OF_PEOPLE = 1000
-AMOUNT_OF_DAYS = 1000
-PROBABILITY_OF_BEING_IN_HOTEL = 0.1
-
-
-def check_if_met_more_than_once(first_list, secound_list, suspects_pairs_count, suspicious_meeting_count):
-    meeting_counter = 0
-
-    for i in first_list:
-        for j in secound_list:
-            if i == j :
-                meeting_counter += 1
-
-    if meeting_counter > 1:
-        suspects_pairs_count += 1
-
-    return suspects_pairs_count, suspicious_meeting_count
-
-
-def is_in_hotel():
-    return random.random() <= PROBABILITY_OF_BEING_IN_HOTEL
-
-
-def calculate_hotel():
-    return random.randint(1, AMOUNT_OF_HOTELS)
+AMOUNT_OF_HOTELS = 10**2                # parameter Nh
+AMOUNT_OF_PEOPLE = 10**4                # parameter N
+AMOUNT_OF_DAYS = 10**2                  # parameter Nd
+PROBABILITY_OF_BEING_IN_HOTEL = 0.1     # parameter P
 
 
 def main():
+    suspicious_pairs = 0
+    suspicious_days_pairs = 0
 
-    list_of_hotels_visits = []
-    for i in range(AMOUNT_OF_PEOPLE):
-        list_of_hotels_visits.append([])
+    meeting_counter = np.zeros((AMOUNT_OF_PEOPLE, AMOUNT_OF_PEOPLE))
+    hotels_guests = [[] for i in range(AMOUNT_OF_HOTELS)]
 
     for day in range(AMOUNT_OF_DAYS):
-        for person in range(AMOUNT_OF_PEOPLE):
-            if is_in_hotel():
-                hotel = calculate_hotel()
-                list_of_hotels_visits[person].append((day, hotel))
+        random_vector = np.random.rand(AMOUNT_OF_PEOPLE)
+        [[hotels_guests[np.random.randint(AMOUNT_OF_HOTELS)].append(person)
+          if random_vector[person] <= PROBABILITY_OF_BEING_IN_HOTEL else None] for person in range(AMOUNT_OF_PEOPLE)]
 
-    suspect_pairs_count = 0
-    suspect_meetings = 0
+        for hotel in hotels_guests:
+            for guest in range(hotel.__len__()):
+                for second_gest in range(guest + 1, hotel.__len__()):
+                    meeting_counter[hotel[guest]][hotel[second_gest]] += 1
+            hotel.clear()
 
     for person in range(AMOUNT_OF_PEOPLE):
-        for person_to_check in range(person + 1, AMOUNT_OF_PEOPLE):
-            suspect_pairs_count, suspect_meetings = check_if_met_more_than_once(list_of_hotels_visits[person],
-                                        list_of_hotels_visits[person_to_check],
-                                        suspect_pairs_count,
-                                        suspect_meetings)
+        for second_person in range(person + 1, AMOUNT_OF_PEOPLE):
+            if meeting_counter[person][second_person] > 1:
+                suspicious_pairs += 1
+                suspicious_days_pairs += (meeting_counter[person][second_person]
+                                          * (meeting_counter[person][second_person] - 1)) / 2
 
-    print('x')
+    print(suspicious_pairs, suspicious_days_pairs)
 
 
 main()
