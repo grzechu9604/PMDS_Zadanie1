@@ -26,12 +26,16 @@ def main():
                     meeting_counter[hotel[guest]][hotel[second_gest]] += 1
             hotel.clear()
 
+    suspicious_people = np.zeros(AMOUNT_OF_PEOPLE)
+
     for person in range(AMOUNT_OF_PEOPLE):
         for second_person in range(person + 1, AMOUNT_OF_PEOPLE):
             if meeting_counter[person][second_person] > 1:
                 suspicious_pairs += 1
                 suspicious_days_pairs += int((meeting_counter[person][second_person]
-                                          * (meeting_counter[person][second_person] - 1)) / 2)
+                                              * (meeting_counter[person][second_person] - 1)) / 2)
+                suspicious_people[person] = 1
+                suspicious_people[second_person] = 1
             if meeting_counter[person][second_person] > 0:
                 if meeting_counter[person][second_person] in histogram:
                     histogram[meeting_counter[person][second_person]] += 1
@@ -41,6 +45,7 @@ def main():
     print("Podejrzane pary \"osób i dni\": ",  suspicious_days_pairs)
     print("Podejrzane pary: ", suspicious_pairs)
     print("Histogram: ", histogram)
+    print("Liczba podejrzanych osób: ", np.sum(suspicious_people))
 
 
 main()
